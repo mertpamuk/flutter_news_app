@@ -1,8 +1,6 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/model/news_model.dart';
+import 'package:news_app/service/news_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -14,11 +12,13 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   List<NewsModel>? _items;
   bool _isLoading = false;
+  late final NewsService _newsService;
 
   @override
   void initState() {
     super.initState();
-    // fetchNews();
+    _newsService = NewsService();
+    //_fetchItems();
   }
 
   void _changeLoading() {
@@ -27,24 +27,11 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<void> fetchNews() async {
-    try {
-      final response = await Dio().get(
-          'https://api.thenewsapi.com/v1/news/all?api_token=Up3ck9GEnYJrqsdNykjm3sv1uSkIfNdIMhEOA5aO&language');
-      if (response.statusCode == 200) {
-        final _datas = response.data["data"];
-        if (_datas is List) {
-          setState(() {
-            _items = _datas.map((e) => NewsModel.fromJson(e)).toList();
-          });
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
+  Future<void> _fetchItems() async {
+    _changeLoading();
+    _items = await _newsService.fetchNews();
+    _changeLoading();
   }
-
-  void sendCountryQueryParameters() {}
 
   @override
   Widget build(BuildContext context) {
@@ -53,21 +40,24 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         title: const Text("News App"),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        itemCount: _items?.length ?? 0,
-        itemBuilder: ((context, index) {
-          return _newsCard(newsModel: _items?[index]);
-        }),
-      ),
-      drawer: _newsDraver(),
-      floatingActionButton: FloatingActionButton(onPressed: () => fetchNews()),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              itemCount: _items?.length ?? 0,
+              itemBuilder: ((context, index) {
+                return _newsCard(newsModel: _items?[index]);
+              }),
+            ),
+      drawer: _newsDrawer(),
+      floatingActionButton:
+          FloatingActionButton(onPressed: () => _fetchItems()),
     );
   }
 }
 
-class _newsDraver extends StatelessWidget {
-  const _newsDraver({
+class _newsDrawer extends StatelessWidget {
+  const _newsDrawer({
     Key? key,
   }) : super(key: key);
 
@@ -115,10 +105,12 @@ class _newsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.0),
               child: Image.network(_newsModel?.imageUrl ?? ""),
             ),
-            const SizedBox(height: 30),
-            Text(
-              _newsModel?.title ?? "Unknown Title",
-              style: Theme.of(context).textTheme.headlineSmall,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 8),
+              child: Text(
+                _newsModel?.title ?? "Unknown Title",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
             Text(_newsModel?.description ?? "Unknown Description"),
           ],

@@ -1,21 +1,25 @@
-
 import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:news_app/model/news_model.dart';
 
-class NewssService {
-  String baseUrl = 'https://api.thenewsapi.com/v1/news/all?api_token=Up3ck9GEnYJrqsdNykjm3sv1uSkIfNdIMhEOA5aO&language=tr';
+import '../model/news_model.dart';
 
+class NewsService {
   Future<List<NewsModel>?> fetchNews() async {
-    final response = await Dio().get(baseUrl);
+    try {
+      final response = await Dio().get(
+          'https://api.thenewsapi.com/v1/news/all?api_token=Up3ck9GEnYJrqsdNykjm3sv1uSkIfNdIMhEOA5aO&language=tr');
 
-    if(response.statusCode == HttpStatus.ok){
-      final _datas = response.data;
-
-      if (_datas is List) {
-        return _datas.map((e) => NewsModel.fromJson(e)).toList();
+      if (response.statusCode == HttpStatus.ok) {
+        final datas = response.data["data"];
+        if (datas is List) {
+          return datas.map((e) => NewsModel.fromJson(e)).toList();
+        }
+      } else {
+        return null;
       }
-    }else if(response.statusCode == HttpStatus.badRequest){}
-    return null;
+    } catch (e) {
+      return null;
+    }
   }
 }
