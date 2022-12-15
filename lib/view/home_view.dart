@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/constants/countries.dart';
 import 'package:news_app/model/news_model.dart';
 import 'package:news_app/service/news_service.dart';
 
@@ -18,7 +19,6 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _newsService = NewsService();
-    //_fetchItems();
   }
 
   void _changeLoading() {
@@ -27,9 +27,9 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<void> _fetchItems() async {
+  Future<void> _fetchItems(String lang) async {
     _changeLoading();
-    _items = await _newsService.fetchNews();
+    _items = await _newsService.fetchNews("$lang");
     _changeLoading();
   }
 
@@ -49,36 +49,25 @@ class _HomeViewState extends State<HomeView> {
                 return _newsCard(newsModel: _items?[index]);
               }),
             ),
-      drawer: _newsDrawer(),
+      drawer: _NewsDrawer(),
       floatingActionButton:
-          FloatingActionButton(onPressed: () => _fetchItems()),
+          FloatingActionButton(onPressed: () => _fetchItems("")),
     );
   }
-}
 
-class _newsDrawer extends StatelessWidget {
-  const _newsDrawer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Drawer _NewsDrawer() {
     return Drawer(
-      child: ListView(padding: EdgeInsets.zero, children: [
-        DrawerHeader(
-          decoration: const BoxDecoration(color: Colors.blue),
-          child: Text(
-            "Countries",
-            style: Theme.of(context).textTheme.headline5,
-          ),
-        ),
-        ListTile(
-          title: const Text("Turkey"),
-          onTap: () => null,
-        ),
-        const ListTile(title: Text("England"))
-      ]),
-    );
+        child: ListView.builder(
+      itemCount: Country.countryList.length,
+      itemBuilder: (context, index) => ListTile(
+        title: Text(Country.countryList[index].name),
+        onTap: () {
+          _fetchItems(Country.countryList[index].code);
+          print(Country.countryList[index].code);
+          Navigator.of(context).pop();
+        },
+      ),
+    ));
   }
 }
 
@@ -103,19 +92,30 @@ class _newsCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20.0),
-              child: Image.network(_newsModel?.imageUrl ?? ""),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 8),
-              child: Text(
-                _newsModel?.title ?? "Unknown Title",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Image.network(
+                _newsModel?.imageUrl ?? "",
+                errorBuilder: (context, error, stackTrace) {
+                   print(error);
+                   return const Icon(Icons.error);
+                }
               ),
             ),
-            Text(_newsModel?.description ?? "Unknown Description"),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Text(
+                _newsModel?.title ?? "Unknown Title",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+              child: Text(_newsModel?.description ?? "Unknown Description"),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+//
