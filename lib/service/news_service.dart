@@ -14,7 +14,7 @@ class NewsService {
       if (datas is List) {
         return datas.map((e) => NewsModel.fromJson(e)).toList();
       }
-    } else if(response.statusCode == HttpStatus.forbidden || response.statusCode == HttpStatus.notFound){
+    } else{
       return null;
     }
   }

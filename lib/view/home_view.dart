@@ -3,6 +3,9 @@ import 'package:news_app/constants/countries.dart';
 import 'package:news_app/model/news_model.dart';
 import 'package:news_app/service/news_service.dart';
 
+import '../components/news_card.dart';
+import '../constants/utils.dart';
+
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -50,104 +53,98 @@ class _HomeViewState extends State<HomeView> {
 
   ListView _buildBody() {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: NewsPadding.newsPaddingHorizontalMid,
       itemCount: _items?.length ?? 0,
       itemBuilder: ((context, index) {
-        return _newsCard(newsModel: _items?[index]);
+        return NewsCard(newsModel: _items?[index]);
       }),
     );
   }
 
   AppBar _buildAppBar() {
     return AppBar(
+      shape:
+          RoundedRectangleBorder(borderRadius: NewsRadius.newsRadiusCircular),
       elevation: 10,
       actions: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: NewsPadding.newsPaddingAllMid,
           child: Center(
             child: _langCode == "" ? null : Text("$_lang | Page: $_page"),
           ),
         ),
       ],
-      title: const Text("News App"),
-      centerTitle: true,
+      title: const Text(NewsStrings.appTitle),
     );
   }
 
   Row _floatingActionButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton(
-          child: const Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            if (_page > 1) {
-              _page--;
-              _fetchItems(_langCode, _page);
-            }
-          },
-        ),
-        const SizedBox(width: 10),
-        FloatingActionButton(
-          child: const Icon(Icons.arrow_forward_ios),
-          onPressed: () {
-            _page++;
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      FloatingActionButton(
+        child: const Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          if (_page > 1) {
+            _page--;
             _fetchItems(_langCode, _page);
-          },
-        ),
-      ],
-    );
+          }
+        },
+      ),
+      NewsSizedBoxes.sizedBox10,
+      FloatingActionButton(
+        child: const Icon(Icons.arrow_forward_ios),
+        onPressed: () {
+          _page++;
+          _fetchItems(_langCode, _page);
+        },
+      )
+    ]);
   }
 
   Drawer _NewsDrawer() {
     return Drawer(
-        child: Column(
-      children: [
+      child: Column(children: [
         DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.blue, boxShadow: [
-              BoxShadow(
-                color: Colors.black,
-                blurRadius: 10,
-              )
-            ]),
+            decoration: BoxDecorationStyles.boxShadow,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: NewsPadding.newsPaddingAllLow,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: const [
                   Text(
-                    "News App",
-                    style: TextStyle(fontSize: 30, color: Colors.white),
+                    NewsStrings.appTitle,
+                    style: NewsTextStyles.drawerHeaderStyleMid,
                   ),
                   Text(
-                    "Countries:",
-                    style: TextStyle(fontSize: 15, color: Colors.white),
+                    NewsStrings.appLangTitle,
+                    style: NewsTextStyles.drawerHeaderStyleLow,
                   ),
                 ],
               ),
             )),
         Expanded(
-          child: ListView.builder(
-            itemCount: Country.countryList.length,
-            itemBuilder: (context, index) => ListTile(
-              title: Text(Country.countryList[index].name),
-              onTap: () {
-                _langCode = Country.countryList[index].code;
-                _lang = Country.countryList[index].name;
-                _page = 1;
-                _fetchItems(_langCode, _page);
-                Navigator.of(context).pop();
-              },
-            ),
+            child: ListView.builder(
+          itemCount: Country.countryList.length,
+          itemBuilder: (context, index) => ListTile(
+            selected: Country.countryList[index].name == _lang ? true : false,
+            title: Text(Country.countryList[index].name),
+            onTap: () {
+              _langCode = Country.countryList[index].code;
+              _lang = Country.countryList[index].name;
+              _page = 1;
+              _fetchItems(_langCode, _page);
+              Navigator.of(context).pop();
+            },
           ),
-        ),
-      ],
-    ));
+        )),
+      ]),
+    );
   }
 }
 
-class _newsCard extends StatelessWidget {
+
+
+/* class _newsCard extends StatelessWidget {
   const _newsCard({
     Key? key,
     required NewsModel? newsModel,
@@ -160,32 +157,31 @@ class _newsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      margin: const EdgeInsets.only(bottom: 20),
+      shape:
+          RoundedRectangleBorder(borderRadius: NewsRadius.newsRadiusCircular),
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: NewsPadding.newsPaddingAllMid,
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: NewsRadius.newsRadiusCircular,
               child: Image.network(_newsModel?.imageUrl ?? "",
                   errorBuilder: (context, error, stackTrace) {
-                print(error);
                 return const Icon(Icons.error);
               }),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: NewsPadding.newsPaddingAllMid,
               child: Text(
-                _newsModel?.title ?? "Unknown Title",
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                _newsModel?.title ?? "",
+                style: NewsTextStyles.newsTitleTextStyle,
               ),
             ),
-            Text(_newsModel?.description ?? "Unknown Description"),
+            Text(_newsModel?.description ?? ""),
           ],
         ),
       ),
     );
   }
 }
+ */
