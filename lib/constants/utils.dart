@@ -34,8 +34,7 @@ class NewsTextStyles {
 }
 
 class BoxDecorationStyles {
-
- static Color newsPrimaryColor = Colors.red.shade300;
+  static Color newsPrimaryColor = Colors.red.shade300;
 
   static BoxDecoration boxShadow =
       BoxDecoration(color: newsPrimaryColor, boxShadow: [
