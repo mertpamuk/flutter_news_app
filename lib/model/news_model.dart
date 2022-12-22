@@ -12,17 +12,18 @@ class NewsModel {
   List<String>? categories;
   String? relevanceScore;
 
-  NewsModel(
-      {this.uuid,
-      this.title,
-      this.description,
-      this.keywords,
-      this.snippet,
-      this.url,
-      this.imageUrl,
-      this.language,
-      this.publishedAt,
-      this.source,});
+  NewsModel({
+    this.uuid,
+    this.title,
+    this.description,
+    this.keywords,
+    this.snippet,
+    this.url,
+    this.imageUrl,
+    this.language,
+    this.publishedAt,
+    this.source,
+  });
 
   NewsModel.fromJson(Map<String, dynamic> json) {
     uuid = json['uuid'];

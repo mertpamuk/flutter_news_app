@@ -24,9 +24,9 @@ class NewsCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: NewsRadius.newsRadiusCircular,
-              child: Image.network(_newsModel?.imageUrl ?? "",
-              fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
+              child:
+                  Image.network(_newsModel?.imageUrl ?? "", fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
                 return const Icon(Icons.error);
               }),
             ),
