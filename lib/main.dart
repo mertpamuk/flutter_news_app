@@ -15,13 +15,13 @@ class MyApp extends StatelessWidget {
       title: NewsStrings.appTitle,
       home: const HomeView(),
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.blueAccent,
+        appBarTheme: AppBarTheme(
+          backgroundColor: BoxDecorationStyles.newsPrimaryColor,
         ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: Colors.blueAccent),
-        listTileTheme:  const ListTileThemeData(
-          selectedTileColor: Colors.blueAccent,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+            backgroundColor: BoxDecorationStyles.newsPrimaryColor),
+        listTileTheme: ListTileThemeData(
+          selectedTileColor: BoxDecorationStyles.newsPrimaryColor,
           selectedColor: Colors.white,
         ),
       ),

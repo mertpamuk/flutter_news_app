@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/constants/categories.dart';
 import 'package:news_app/constants/countries.dart';
 import 'package:news_app/model/news_model.dart';
 import 'package:news_app/service/news_service.dart';
@@ -15,8 +16,9 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _page = 1;
-  String _langCode = "";
-  String _lang = "";
+  String _langCode = "en";
+  String _lang = "English";
+  String _category = "general";
   List<NewsModel>? _items;
   bool _isLoading = false;
   late final NewsService _newsService;
@@ -25,6 +27,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _newsService = NewsService();
+    _fetchItems(_langCode, _page, _category);
   }
 
   void _changeLoading() {
@@ -33,9 +36,9 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<void> _fetchItems(String lang, int page) async {
+  Future<void> _fetchItems(String lang, int page, String category) async {
     _changeLoading();
-    _items = await _newsService.fetchNews(lang, page);
+    _items = await _newsService.fetchNews(lang, page, category);
     _changeLoading();
   }
 
@@ -43,21 +46,54 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildBody(),
+      body: Column(children: [
+        _buildCategoryBar(),
+        _buildBody(),
+      ]),
       drawer: _NewsDrawer(),
       floatingActionButton: _langCode == "" ? null : _floatingActionButtons(),
     );
   }
 
-  ListView _buildBody() {
-    return ListView.builder(
-      padding: NewsPadding.newsPaddingHorizontalMid,
-      itemCount: _items?.length ?? 0,
-      itemBuilder: ((context, index) {
-        return NewsCard(newsModel: _items?[index]);
-      }),
+  Expanded _buildBody() {
+    return Expanded(
+      child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: NewsPadding.newsPaddingHorizontalMid,
+              itemCount: _items?.length ?? 0,
+              itemBuilder: ((context, index) {
+                return NewsCard(newsModel: _items?[index]);
+              }),
+            ),
+    );
+  }
+
+  SizedBox _buildCategoryBar() {
+    return SizedBox(
+      height: 40,
+      child: Expanded(
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: NewsCategories.categories.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Padding(
+                padding: NewsPadding.newsPaddingAllMin,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        BoxDecorationStyles.newsPrimaryColor),
+                  ),
+                  child: Text(NewsCategories.categories[index]),
+                  onPressed: () {
+                    _category = NewsCategories.categories[index];
+                    _page = 1;
+                    _fetchItems(_langCode, _page, _category);
+                  },
+                ),
+              );
+            }),
+      ),
     );
   }
 
@@ -70,7 +106,9 @@ class _HomeViewState extends State<HomeView> {
         Padding(
           padding: NewsPadding.newsPaddingAllMid,
           child: Center(
-            child: _langCode == "" ? null : Text("$_lang | Page: $_page"),
+            child: _langCode == ""
+                ? null
+                : Text("$_lang | $_category | Page: $_page"),
           ),
         ),
       ],
@@ -85,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
         onPressed: () {
           if (_page > 1) {
             _page--;
-            _fetchItems(_langCode, _page);
+            _fetchItems(_langCode, _page, _category);
           }
         },
       ),
@@ -94,7 +132,7 @@ class _HomeViewState extends State<HomeView> {
         child: const Icon(Icons.arrow_forward_ios),
         onPressed: () {
           _page++;
-          _fetchItems(_langCode, _page);
+          _fetchItems(_langCode, _page, _category);
         },
       )
     ]);
@@ -132,7 +170,7 @@ class _HomeViewState extends State<HomeView> {
               _langCode = Country.countryList[index].code;
               _lang = Country.countryList[index].name;
               _page = 1;
-              _fetchItems(_langCode, _page);
+              _fetchItems(_langCode, _page, _category);
               Navigator.of(context).pop();
             },
           ),
@@ -141,47 +179,3 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 }
-
-
-
-/* class _newsCard extends StatelessWidget {
-  const _newsCard({
-    Key? key,
-    required NewsModel? newsModel,
-  })  : _newsModel = newsModel,
-        super(key: key);
-
-  final NewsModel? _newsModel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      shape:
-          RoundedRectangleBorder(borderRadius: NewsRadius.newsRadiusCircular),
-      child: Padding(
-        padding: NewsPadding.newsPaddingAllMid,
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: NewsRadius.newsRadiusCircular,
-              child: Image.network(_newsModel?.imageUrl ?? "",
-                  errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.error);
-              }),
-            ),
-            Padding(
-              padding: NewsPadding.newsPaddingAllMid,
-              child: Text(
-                _newsModel?.title ?? "",
-                style: NewsTextStyles.newsTitleTextStyle,
-              ),
-            ),
-            Text(_newsModel?.description ?? ""),
-          ],
-        ),
-      ),
-    );
-  }
-}
- */

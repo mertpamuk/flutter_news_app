@@ -6,12 +6,18 @@ class NewsStrings {
 }
 
 class NewsPadding {
+  static const EdgeInsets newsPaddingAllMin = EdgeInsets.all(5);
   static const EdgeInsets newsPaddingAllLow = EdgeInsets.all(8.0);
   static const EdgeInsets newsPaddingAllMid = EdgeInsets.all(10.0);
   static const EdgeInsets newsPaddingAllHigh = EdgeInsets.all(15.0);
 
   static const EdgeInsets newsPaddingHorizontalMid =
       EdgeInsets.symmetric(horizontal: 10);
+
+  static const EdgeInsets newsPaddingVerticalLow =
+      EdgeInsets.symmetric(vertical: 5);
+
+  static const EdgeInsets newsCategoriesPading = EdgeInsets.all(2);
 }
 
 class NewsRadius {
@@ -28,9 +34,12 @@ class NewsTextStyles {
 }
 
 class BoxDecorationStyles {
-  static const BoxDecoration boxShadow =
-      BoxDecoration(color: Colors.blueAccent, boxShadow: [
-    BoxShadow(
+
+ static Color newsPrimaryColor = Colors.red.shade300;
+
+  static BoxDecoration boxShadow =
+      BoxDecoration(color: newsPrimaryColor, boxShadow: [
+    const BoxShadow(
       color: Colors.black,
       blurRadius: 10,
     ),
